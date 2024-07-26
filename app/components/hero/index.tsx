@@ -305,7 +305,7 @@ export const Hero = () => {
                   e.preventDefault()
                   setCurrentPage(Math.min(currentPage + 1, totalPages))
                 }}
-              />
+              />;
             </PaginationItem>
           </PaginationContent>
         </Pagination>
