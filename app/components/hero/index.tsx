@@ -35,18 +35,17 @@ import { IoMdDownload } from "react-icons/io"
 
 
 const useWindowWidth = () => {
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [windowWidth, setWindowWidth] = useState<number>(typeof window !== "undefined" ? window.innerWidth : 1024);
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [])
+  }, []);
 
   return windowWidth;
 };
-
 interface QRCodeData {
   title: string
   url: string
@@ -83,12 +82,16 @@ export const Hero = () => {
   }
 
   
-  const truncateUrl = (url: string, maxLength: number = windowWidth > 768 ? 50 : 30) => {
-    if (url.length > maxLength) {
-      return `${url.slice(0, maxLength - 3)}...`
+  const truncateUrl = (url: string, maxLength: number = 30) => {
+    const isClient = typeof window !== "undefined";
+    const currentMaxLength = isClient ? (window.innerWidth > 768 ? 50 : 30) : 30;
+    
+    if (url.length > currentMaxLength) {
+      return `${url.slice(0, currentMaxLength - 3)}...`;
     }
-    return url
-  }
+    return url;
+  };
+  
 
   const generateQRCode = async () => {
     if (url.trim() === "") {
