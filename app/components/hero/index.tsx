@@ -33,6 +33,20 @@ import {
 import { MdDeleteForever, MdModeEdit } from "react-icons/md"
 import { IoMdDownload } from "react-icons/io"
 
+
+const useWindowWidth = () => {
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return windowWidth;
+};
+
 interface QRCodeData {
   title: string
   url: string
@@ -48,6 +62,7 @@ export const Hero = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [deletingIndex, setDeletingIndex] = useState<number | null>(null)
   const itemsPerPage = 3
+  const windowWidth = useWindowWidth()
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -67,7 +82,8 @@ export const Hero = () => {
     }
   }
 
-  const truncateUrl = (url: string, maxLength: number = 50) => {
+  
+  const truncateUrl = (url: string, maxLength: number = windowWidth > 768 ? 50 : 30) => {
     if (url.length > maxLength) {
       return `${url.slice(0, maxLength - 3)}...`
     }
@@ -185,7 +201,7 @@ export const Hero = () => {
 
   return (
     <>
-      <div className="flex items-center justify-center max-w-[800px] w-full gap-4 mt-20">
+      <div className="flex items-center justify-center max-w-[350px] md:max-w-[800px]  w-full gap-4 mt-20 ">
         <Input
           type="text"
           placeholder="Digite um Titulo (opcional)"
@@ -208,7 +224,7 @@ export const Hero = () => {
       <div className="flex flex-col gap-4 mt-20 relative">
         {paginatedQRCodes.map((qrCode, index) => (
           <div key={index} className="flex w-full">
-            <Card className="text-center w-[800px] flex">
+            <Card className="text-center w-[300px] md:w-[800px] flex flex-col md:flex-row items-center md:items-none">
               <div id={`qrcode-${index}`}>
                 <QRCodeSVG
                   value={qrCode.url}
@@ -216,13 +232,15 @@ export const Hero = () => {
                   style={{ margin: "10px" }}
                 />
               </div>
-              <div className="flex mt-4">
-                <div className="flex flex-col gap-10 mt-3">
-                  <h2 className="max-w-60 w-fit">Titulo: <span className="font-bold">{qrCode.title}</span></h2>
-                  <h2>Url: <span className="font-bold">{truncateUrl(qrCode.url)}</span></h2>
-                </div>
-              
-                <div className="flex gap-2 ml-[150px] fixed left-[53%]">
+              <div className="flex mb-4 md:mt-4 md:mb-0 relative flex-col md:flex-row">
+                <div className="flex flex-col gap-2 md:gap-4 mt-0 relative">
+                  <h2 className="max-w-10 md:max-w-60 w-fit">Titulo: <span className="font-bold">{qrCode.title}</span></h2>
+                  <div className="flex  md:max-w-[500px] w-fit">
+                  <h2>Url:</h2>
+                  <span className="font-bold">{truncateUrl(qrCode.url)}</span>
+                  </div>
+                </div>              
+                <div className="flex justify-center mt-2 gap-2 md:ml-[150px] md:absolute left-[10px] md:left-[280px] top-[-20px]">
                   <Button variant="outline" className="text-xl" onClick={() => startEditing(index)}>
                     <MdModeEdit />
                   </Button>
